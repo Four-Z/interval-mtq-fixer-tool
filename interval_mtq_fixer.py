@@ -61,23 +61,37 @@ def solve_interval(scores, max_interval):
     # Implementasi Aturan 2: Interval atas dan bawah sama
     if abs(interval_high - interval_low) < 0.001:
         # Gunakan max_interval / 2 * 1.2 untuk sesuaikan nilai
-        adjustment = max_interval / 2 * 1.2
-        adjusted_scores[highest_name] = highest - adjustment
+        adjustment = max_interval / 2
+        adjusted_scores[highest_name] = middle + adjustment
         # Nilai tengah tetap
-        adjusted_scores[lowest_name] = lowest + adjustment
+        adjusted_scores[lowest_name] = middle - adjustment
         return adjusted_scores, f"Aturan 2: Interval atas dan bawah sama. {highest_name} diturunkan dan {lowest_name} dinaikkan."
 
-    # Implementasi Aturan 3: Interval atas dan bawah berbeda, nilai tengah sebagai acuan
+    # Implementasi Aturan 3: 2 nilai tidak memiliki interval (dalam batas maksimal interval) dan nilai ke-3 terlalu rendah atau terlalu tinggi, maka hanya nilai ke-3 yang disesuaikan.
+    # Dua teratas dekat, lowest terlalu rendah
+    if interval_high <= max_interval and interval_total > max_interval:
+        if interval_high >= max_interval / 2:
+            adjusted_scores[highest_name] = middle + max_interval/2
+            adjusted_scores[lowest_name] = adjusted_scores[highest_name] - max_interval
+        else:
+            adjusted_scores[lowest_name] = lowest + max_interval
+
+        return adjusted_scores, f"Aturan 3: Dua nilai teratas tidak memiliki interval. {lowest_name} dinaikkan."
+    # Dua terbawah dekat, highest terlalu tinggi
+    elif interval_low <= max_interval and interval_total > max_interval:
+        if interval_low >= max_interval / 2:
+            adjusted_scores[lowest_name] = middle - max_interval/2
+            adjusted_scores[highest_name] = adjusted_scores[lowest_name] + max_interval
+        else:
+            adjusted_scores[highest_name] = lowest + max_interval
+        return adjusted_scores, f"Aturan 3: Dua nilai terbawah tidak memiliki interval. {highest_name} diturunkan."
+
+    # Implementasi Aturan 4: Interval atas dan bawah berbeda, nilai tengah sebagai acuan
     if scores_list.count(middle) == 1:  # Hanya ada satu nilai tengah
         half_max_interval = max_interval / 2
         adjusted_scores[highest_name] = middle + half_max_interval
         adjusted_scores[lowest_name] = middle - half_max_interval
-        return adjusted_scores, f"Aturan 3: Interval atas dan bawah berbeda. Nilai tengah ({middle_name}) dijadikan acuan."
-
-    # Implementasi Aturan 4: Dua nilai teratas tidak memiliki interval (≤ max_interval)
-    if interval_high <= max_interval and interval_low > max_interval:
-        adjusted_scores[lowest_name] = highest - max_interval
-        return adjusted_scores, f"Aturan 4: Dua nilai teratas tidak memiliki interval. {lowest_name} dinaikkan."
+        return adjusted_scores, f"Aturan 4: Interval atas dan bawah berbeda. Nilai tengah ({middle_name}) dijadikan acuan."
 
     # Jika tidak ada aturan yang tepat, gunakan pendekatan umum
     if interval_total > max_interval:
@@ -110,16 +124,22 @@ def main():
         
         2. **Aturan 2**: Jika interval atas dan bawah sama, maka nilai tertinggi dikurangi dan nilai terendah ditambah dengan proporsi yang sesuai dengan max interval.
         
-        3. **Aturan 3**: Jika interval atas dan bawah berbeda dengan nilai tengah sebagai acuan, maka:
+        3. **Aturan 3**: Jika 2 nilai tidak memiliki interval (dalam batas maksimal interval) dan nilai ke-3 terlalu rendah atau terlalu tinggi, maka hanya nilai ke-3 yang disesuaikan.
+                    
+        4. **Aturan 4**: Jika interval atas dan bawah berbeda dengan nilai tengah sebagai acuan, maka:
            - Nilai tertinggi = nilai tengah + (maksimal interval/2)
            - Nilai tengah tetap
            - Nilai terendah = nilai tengah - (maksimal interval/2)
         
-        4. **Aturan 4**: Jika 2 nilai teratas tidak memiliki interval (dalam batas maksimal interval) dan nilai ke-3 terlalu rendah, maka hanya nilai ke-3 yang disesuaikan.
+       
         """)
 
     options = (
+        "Max Nilai: 15 | Max Interval: 0.75",
+        "Max Nilai: 20 | Max Interval: 1",
         "Max Nilai: 25 | Max Interval: 1.25",
+        "Max Nilai: 30 | Max Interval: 1.5",
+        "Max Nilai: 40 | Max Interval: 2",
         "Max Nilai: 50 | Max Interval: 2.5",
         "Max Nilai: 100 | Max Interval: 5.0",
     )
@@ -130,11 +150,26 @@ def main():
     index = options.index(option)
 
     if index == 0:
-        max_nilai, max_interval = 25.0, 1.25
+        max_nilai = 15.0
+        max_interval = 0.75
     elif index == 1:
-        max_nilai, max_interval = 50.0, 2.5
+        max_nilai = 20.0
+        max_interval = 1.0
     elif index == 2:
-        max_nilai, max_interval = 100.0, 5.0
+        max_nilai = 25.0
+        max_interval = 1.25
+    elif index == 3:
+        max_nilai = 30.0
+        max_interval = 1.5
+    elif index == 4:
+        max_nilai = 40.0
+        max_interval = 2.0
+    elif index == 5:
+        max_nilai = 50.0
+        max_interval = 2.5
+    elif index == 6:
+        max_nilai = 100.0
+        max_interval = 5.0
 
     st.write(f"Max Nilai: {max_nilai} | Max Interval: {max_interval}")
 
