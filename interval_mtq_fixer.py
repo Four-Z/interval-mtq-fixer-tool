@@ -60,7 +60,7 @@ def solve_interval(scores, max_interval):
 
     # Implementasi Aturan 2: Interval atas dan bawah sama
     if abs(interval_high - interval_low) < 0.001:
-        # Gunakan max_interval / 2 * 1.2 untuk sesuaikan nilai
+        # Gunakan max_interval / 2 
         adjustment = max_interval / 2
         adjusted_scores[highest_name] = middle + adjustment
         # Nilai tengah tetap
