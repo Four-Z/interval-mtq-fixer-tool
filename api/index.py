@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Response
+from http.server import BaseHTTPRequestHandler
 
 app = Flask(__name__)
 
@@ -285,4 +286,10 @@ def index():
 
 # Vercel handler function
 def handler(request):
-    return app(request.environ, lambda status, headers, exc_info: [status, headers, []])
+    with app.request_context(request.environ):
+        return app.full_dispatch_request()
+
+# Menambahkan fungsi ini untuk kompatibilitas Vercel
+def app_handler(environ, start_response):
+    response = app(environ, start_response)
+    return response
