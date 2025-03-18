@@ -1,5 +1,4 @@
-from flask import Flask, request, jsonify, Response
-from http.server import BaseHTTPRequestHandler
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
@@ -203,7 +202,7 @@ def get_interval_config():
 @app.route('/', methods=['GET'])
 def index():
     """Endpoint untuk dokumentasi API sederhana"""
-    html_content = """
+    return """
     <html>
     <head>
         <title>Interval Fixer API</title>
@@ -281,15 +280,3 @@ def index():
     </body>
     </html>
     """
-    return Response(html_content, mimetype='text/html')
-
-
-# Vercel handler function
-def handler(request):
-    with app.request_context(request.environ):
-        return app.full_dispatch_request()
-
-# Menambahkan fungsi ini untuk kompatibilitas Vercel
-def app_handler(environ, start_response):
-    response = app(environ, start_response)
-    return response
